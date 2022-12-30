@@ -19,6 +19,7 @@ namespace Datapackager.src.data
         private Dictionary<string, dynamic> packMCMETA;
 
         private List<BaseItem> items;
+        private List<PackFile> packFiles;
 
         public Datapack(string exportPath, string name, string desc) : this(exportPath, name, desc, CURRENT_DATAPACK_VERSION) { }
 
@@ -27,7 +28,8 @@ namespace Datapackager.src.data
             this.directory = exportPath;
             this.name = name;
             this.items = new List<BaseItem>();
-            this.packMCMETA = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(DEFAULT_MCMETA.Replace("%PACK_FORMAT%", version.ToString()).Replace("%PACK_DESCRIPTION%", desc));
+            this.packFiles = new List<PackFile>();
+            this.packMCMETA = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(DEFAULT_MCMETA.Replace("%PACK_FORMAT%", version.ToString()).Replace("%PACK_DESCRIPTION%", desc));
         }
 
         public void exportPack()
@@ -41,6 +43,11 @@ namespace Datapackager.src.data
             foreach(BaseItem item in items)
             {
                 createFile(directory + "\\data\\" + name + "\\functions\\give", item.getInternalName() + ".mcfunction", item.giveFunction().getCommandsString());
+            }
+
+            foreach(PackFile packFile in packFiles)
+            {
+                createFile(directory + "\\data\\" + Path.GetDirectoryName(packFile.getPath()), Path.GetFileName(packFile.getPath()), packFile.getContents());
             }
         }
 
@@ -72,6 +79,11 @@ namespace Datapackager.src.data
         public void addItem(BaseItem item)
         {
             items.Add(item);
+        }
+
+        public void addPackFile(PackFile file)
+        {
+            packFiles.Add(file);
         }
     }
 }

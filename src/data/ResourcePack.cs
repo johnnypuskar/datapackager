@@ -22,6 +22,8 @@ namespace Datapackager.src.data
         private int nextModelID;
         private Dictionary<string, List<BaseItem>> items;
 
+        private List<PackFile> packFiles;
+
         private Dictionary<string, dynamic> packMCMETA;
 
         public ResourcePack(string exportPath, string desc, int initialModelID, int version)
@@ -29,6 +31,7 @@ namespace Datapackager.src.data
             this.directory = exportPath;
             this.nextModelID = initialModelID - 1;
             this.items = new Dictionary<string, List<BaseItem>>();
+            this.packFiles = new List<PackFile>();
 
             this.packMCMETA = this.packMCMETA = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(DEFAULT_MCMETA.Replace("%PACK_FORMAT%", version.ToString()).Replace("%PACK_DESCRIPTION%", desc));
         }
@@ -87,6 +90,11 @@ namespace Datapackager.src.data
                 baseModelItem["overrides"] = overrides;
 
                 createFile(directory + "\\assets\\minecraft\\models\\item", baseModel, JsonConvert.SerializeObject(baseModelItem));
+            }
+
+            foreach (PackFile packFile in packFiles)
+            {
+                createFile(directory + "\\assets\\" + Path.GetDirectoryName(packFile.getPath()), Path.GetFileName(packFile.getPath()), packFile.getContents());
             }
         }
 
@@ -147,6 +155,11 @@ namespace Datapackager.src.data
                 result = reader.ReadToEnd();
             }
             return JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(result);
+        }
+
+        public void addPackFile(PackFile file)
+        {
+            packFiles.Add(file);
         }
     }
 }

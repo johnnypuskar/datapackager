@@ -14,16 +14,16 @@ namespace Datapackager.src.data
     internal class ProjectPack
     {
         private List<Dictionary<string, dynamic>> itemRegistry;
+        private List<Dictionary<string, dynamic>> fileRegistry;
         
         public ProjectPack()
         {
             itemRegistry = new List<Dictionary<string, dynamic>>();
+            fileRegistry = new List<Dictionary<string, dynamic>>();
         }
 
         public bool exportProject(string exportPath)
         {
-            //if (Directory.Exists(datapackFolder)) { Directory.Delete(datapackFolder, true); }
-
             string projectName = "export";
 
             ResourcePack rp = new ResourcePack(exportPath + "\\" + projectName + "_RP");
@@ -58,12 +58,29 @@ namespace Datapackager.src.data
                 rp.addItem(item);
             }
 
+            foreach (Dictionary<string, dynamic> fileRegister in fileRegistry)
+            {
+                PackFile packFile = new PackFile(fileRegister["namespace"] + "\\" + fileRegister["path"], fileRegister["contents"]);
+
+                if (fileRegister["datapack"])
+                {
+                    dp.addPackFile(packFile);
+                }
+                else
+                {
+                    rp.addPackFile(packFile);
+                }
+            }
+
             rp.exportPack();
             dp.exportPack();
             return true;
         }
 
         public List<Dictionary<string, dynamic>> getItemRegistry() { return itemRegistry; }
+
+        public List<Dictionary<string, dynamic>> getFileRegistry() { return fileRegistry; }
+
         public void addNewItem()
         {
             Dictionary<string, dynamic> newItem = new Dictionary<string, dynamic>()
@@ -82,6 +99,23 @@ namespace Datapackager.src.data
             itemRegistry.RemoveAt(index);
         }
 
+        public void addNewFile()
+        {
+            Dictionary<string, dynamic> newFile = new Dictionary<string, dynamic>()
+            {
+                { "datapack", true },
+                { "namespace", "minecraft" },
+                { "path", "new_file.txt" },
+                { "contents", "" }
+            };
+            fileRegistry.Add(newFile);
+        }
+
+        public void removeFile(int index)
+        {
+            fileRegistry.RemoveAt(index);
+        }
+
         public bool saveProject(Stream file)
         {
             try
@@ -90,7 +124,8 @@ namespace Datapackager.src.data
 
                 Dictionary<string, dynamic> jsonDict = new Dictionary<string, dynamic>()
                 {
-                    { "items", itemRegistry }
+                    { "items", itemRegistry },
+                    { "files", fileRegistry }
                 };
 
                 writer.Write(JsonConvert.SerializeObject(jsonDict));
@@ -121,6 +156,19 @@ namespace Datapackager.src.data
                         if (itemRegistry.Last()[key] is Int64)
                         {
                             itemRegistry.Last()[key] = Convert.ToInt32(itemRegistry.Last()[key]);
+                        }
+                    }
+                }
+
+                fileRegistry.Clear();
+                foreach(JObject entry in jsonDict["files"])
+                {
+                    fileRegistry.Add(entry.ToObject<Dictionary<string, dynamic>>());
+                    foreach (string key in fileRegistry.Last().Keys)
+                    {
+                        if (fileRegistry.Last()[key] is Int64)
+                        {
+                            fileRegistry.Last()[key] = Convert.ToInt32(fileRegistry.Last()[key]);
                         }
                     }
                 }

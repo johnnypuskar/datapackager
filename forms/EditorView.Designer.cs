@@ -35,6 +35,9 @@
             this.addItemButton = new System.Windows.Forms.Button();
             this.removeItemButton = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.addFileButton = new System.Windows.Forms.Button();
+            this.removeFileButton = new System.Windows.Forms.Button();
+            this.fileList = new System.Windows.Forms.ListBox();
             this.blockTextureDisplay = new System.Windows.Forms.PictureBox();
             this.windowControl = new System.Windows.Forms.TabControl();
             this.blocksPage = new System.Windows.Forms.TabPage();
@@ -54,7 +57,15 @@
             this.itemLore = new System.Windows.Forms.RichTextBox();
             this.itemName = new System.Windows.Forms.TextBox();
             this.itemTextureDisplay = new System.Windows.Forms.PictureBox();
-            this.filesPage = new System.Windows.Forms.TabPage();
+            this.fileWindow = new System.Windows.Forms.TabPage();
+            this.filePathLabel = new System.Windows.Forms.Label();
+            this.fileNamespaceLabel = new System.Windows.Forms.Label();
+            this.filePath = new System.Windows.Forms.TextBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.filePackDatapack = new System.Windows.Forms.RadioButton();
+            this.filePackResource = new System.Windows.Forms.RadioButton();
+            this.fileNamespace = new System.Windows.Forms.TextBox();
+            this.fileContents = new System.Windows.Forms.RichTextBox();
             this.openItemTexture = new System.Windows.Forms.OpenFileDialog();
             this.saveProjectDialog = new System.Windows.Forms.SaveFileDialog();
             this.saveButton = new System.Windows.Forms.Button();
@@ -64,6 +75,7 @@
             this.exportProjectDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.tabWindow.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.blockTextureDisplay)).BeginInit();
             this.windowControl.SuspendLayout();
             this.blocksPage.SuspendLayout();
@@ -74,6 +86,8 @@
             this.itemFoodWindow.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.itemTextureDisplay)).BeginInit();
+            this.fileWindow.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabWindow
@@ -145,6 +159,9 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.addFileButton);
+            this.tabPage3.Controls.Add(this.removeFileButton);
+            this.tabPage3.Controls.Add(this.fileList);
             this.tabPage3.Location = new System.Drawing.Point(8, 46);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
@@ -152,6 +169,38 @@
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Raw Files";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // addFileButton
+            // 
+            this.addFileButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.addFileButton.Location = new System.Drawing.Point(332, 879);
+            this.addFileButton.Name = "addFileButton";
+            this.addFileButton.Size = new System.Drawing.Size(46, 46);
+            this.addFileButton.TabIndex = 7;
+            this.addFileButton.Text = "+";
+            this.addFileButton.UseVisualStyleBackColor = true;
+            this.addFileButton.Click += new System.EventHandler(this.addFileButton_Click);
+            // 
+            // removeFileButton
+            // 
+            this.removeFileButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.removeFileButton.Location = new System.Drawing.Point(280, 879);
+            this.removeFileButton.Name = "removeFileButton";
+            this.removeFileButton.Size = new System.Drawing.Size(46, 46);
+            this.removeFileButton.TabIndex = 8;
+            this.removeFileButton.Text = "-";
+            this.removeFileButton.UseVisualStyleBackColor = true;
+            this.removeFileButton.Click += new System.EventHandler(this.removeFileButton_Click);
+            // 
+            // fileList
+            // 
+            this.fileList.FormattingEnabled = true;
+            this.fileList.ItemHeight = 32;
+            this.fileList.Location = new System.Drawing.Point(6, 6);
+            this.fileList.Name = "fileList";
+            this.fileList.Size = new System.Drawing.Size(372, 868);
+            this.fileList.TabIndex = 6;
+            this.fileList.SelectedIndexChanged += new System.EventHandler(this.fileList_SelectedItemChange);
             // 
             // blockTextureDisplay
             // 
@@ -166,7 +215,7 @@
             this.windowControl.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
             this.windowControl.Controls.Add(this.blocksPage);
             this.windowControl.Controls.Add(this.itemsPage);
-            this.windowControl.Controls.Add(this.filesPage);
+            this.windowControl.Controls.Add(this.fileWindow);
             this.windowControl.ItemSize = new System.Drawing.Size(0, 1);
             this.windowControl.Location = new System.Drawing.Point(416, 48);
             this.windowControl.Name = "windowControl";
@@ -365,13 +414,100 @@
             this.itemTextureDisplay.TabStop = false;
             this.itemTextureDisplay.Click += new System.EventHandler(this.itemTexture_Click);
             // 
-            // filesPage
+            // fileWindow
             // 
-            this.filesPage.BackColor = System.Drawing.Color.Transparent;
-            this.filesPage.Location = new System.Drawing.Point(4, 5);
-            this.filesPage.Name = "filesPage";
-            this.filesPage.Size = new System.Drawing.Size(1589, 1191);
-            this.filesPage.TabIndex = 2;
+            this.fileWindow.BackColor = System.Drawing.Color.Transparent;
+            this.fileWindow.Controls.Add(this.filePathLabel);
+            this.fileWindow.Controls.Add(this.fileNamespaceLabel);
+            this.fileWindow.Controls.Add(this.filePath);
+            this.fileWindow.Controls.Add(this.panel2);
+            this.fileWindow.Controls.Add(this.fileNamespace);
+            this.fileWindow.Controls.Add(this.fileContents);
+            this.fileWindow.Location = new System.Drawing.Point(4, 5);
+            this.fileWindow.Name = "fileWindow";
+            this.fileWindow.Size = new System.Drawing.Size(1589, 1191);
+            this.fileWindow.TabIndex = 2;
+            // 
+            // filePathLabel
+            // 
+            this.filePathLabel.AutoSize = true;
+            this.filePathLabel.Location = new System.Drawing.Point(208, 7);
+            this.filePathLabel.Name = "filePathLabel";
+            this.filePathLabel.Size = new System.Drawing.Size(104, 32);
+            this.filePathLabel.TabIndex = 12;
+            this.filePathLabel.Text = "File Path";
+            // 
+            // fileNamespaceLabel
+            // 
+            this.fileNamespaceLabel.AutoSize = true;
+            this.fileNamespaceLabel.Location = new System.Drawing.Point(6, 7);
+            this.fileNamespaceLabel.Name = "fileNamespaceLabel";
+            this.fileNamespaceLabel.Size = new System.Drawing.Size(138, 32);
+            this.fileNamespaceLabel.TabIndex = 11;
+            this.fileNamespaceLabel.Text = "Namespace";
+            // 
+            // filePath
+            // 
+            this.filePath.Location = new System.Drawing.Point(208, 42);
+            this.filePath.Name = "filePath";
+            this.filePath.PlaceholderText = "new_file.txt";
+            this.filePath.Size = new System.Drawing.Size(975, 39);
+            this.filePath.TabIndex = 9;
+            this.filePath.Leave += new System.EventHandler(this.updateFileName_LeaveControlFocus);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.filePackDatapack);
+            this.panel2.Controls.Add(this.filePackResource);
+            this.panel2.Location = new System.Drawing.Point(3, 87);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(377, 40);
+            this.panel2.TabIndex = 9;
+            // 
+            // filePackDatapack
+            // 
+            this.filePackDatapack.AutoSize = true;
+            this.filePackDatapack.Checked = true;
+            this.filePackDatapack.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.filePackDatapack.Location = new System.Drawing.Point(3, 3);
+            this.filePackDatapack.Name = "filePackDatapack";
+            this.filePackDatapack.Size = new System.Drawing.Size(143, 36);
+            this.filePackDatapack.TabIndex = 5;
+            this.filePackDatapack.TabStop = true;
+            this.filePackDatapack.Tag = "0";
+            this.filePackDatapack.Text = "Datapack";
+            this.filePackDatapack.UseVisualStyleBackColor = true;
+            // 
+            // filePackResource
+            // 
+            this.filePackResource.AutoSize = true;
+            this.filePackResource.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.filePackResource.Location = new System.Drawing.Point(152, 3);
+            this.filePackResource.Name = "filePackResource";
+            this.filePackResource.Size = new System.Drawing.Size(195, 36);
+            this.filePackResource.TabIndex = 6;
+            this.filePackResource.Tag = "1";
+            this.filePackResource.Text = "Resource Pack";
+            this.filePackResource.UseVisualStyleBackColor = true;
+            // 
+            // fileNamespace
+            // 
+            this.fileNamespace.Location = new System.Drawing.Point(6, 42);
+            this.fileNamespace.Name = "fileNamespace";
+            this.fileNamespace.PlaceholderText = "minecraft";
+            this.fileNamespace.Size = new System.Drawing.Size(196, 39);
+            this.fileNamespace.TabIndex = 8;
+            this.fileNamespace.Leave += new System.EventHandler(this.updateFileName_LeaveControlFocus);
+            // 
+            // fileContents
+            // 
+            this.fileContents.AcceptsTab = true;
+            this.fileContents.Location = new System.Drawing.Point(3, 132);
+            this.fileContents.Name = "fileContents";
+            this.fileContents.Size = new System.Drawing.Size(1180, 1048);
+            this.fileContents.TabIndex = 2;
+            this.fileContents.Text = "";
+            this.fileContents.WordWrap = false;
             // 
             // openItemTexture
             // 
@@ -404,7 +540,7 @@
             // 
             // exportButton
             // 
-            this.exportButton.Location = new System.Drawing.Point(18, 1156);
+            this.exportButton.Location = new System.Drawing.Point(18, 1198);
             this.exportButton.Name = "exportButton";
             this.exportButton.Size = new System.Drawing.Size(150, 46);
             this.exportButton.TabIndex = 5;
@@ -420,16 +556,19 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2025, 1300);
+            this.ClientSize = new System.Drawing.Size(1628, 1258);
             this.Controls.Add(this.exportButton);
             this.Controls.Add(this.loadButton);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.windowControl);
             this.Controls.Add(this.tabWindow);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "EditorView";
-            this.Text = "EditorView";
+            this.Text = "Datapackager";
             this.tabWindow.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.blockTextureDisplay)).EndInit();
             this.windowControl.ResumeLayout(false);
             this.blocksPage.ResumeLayout(false);
@@ -445,6 +584,10 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.itemTextureDisplay)).EndInit();
+            this.fileWindow.ResumeLayout(false);
+            this.fileWindow.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -459,7 +602,7 @@
         private TabControl windowControl;
         private TabPage blocksPage;
         private TabPage itemsPage;
-        private TabPage filesPage;
+        private TabPage fileWindow;
         private RichTextBox itemLore;
         private TextBox itemName;
         private PictureBox itemTextureDisplay;
@@ -485,5 +628,16 @@
         private OpenFileDialog loadProjectDialog;
         private Button exportButton;
         private FolderBrowserDialog exportProjectDialog;
+        private Button addFileButton;
+        private Button removeFileButton;
+        private ListBox fileList;
+        private Label filePathLabel;
+        private Label fileNamespaceLabel;
+        private TextBox filePath;
+        private Panel panel2;
+        private RadioButton filePackDatapack;
+        private RadioButton filePackResource;
+        private TextBox fileNamespace;
+        private RichTextBox fileContents;
     }
 }

@@ -22,20 +22,38 @@ namespace Datapackager.forms
         private ProjectPack pack;
 
         private int selectedItemIndex = -1;
+        private int selectedFileIndex = -1;
 
         public EditorView()
         {
             InitializeComponent();
             pack = new ProjectPack();
+
+            // Start on Items since blocks don't have a use rn
+            tabWindow.SelectedIndex = 1;
+            windowControl.SelectedIndex = 1;
+
+            windowControl.Visible = false;
         }
 
         private void tabWindow_Selecting(object sender, EventArgs e)
         {
             windowControl.SelectedIndex = tabWindow.SelectedIndex;
 
-            if(tabWindow.SelectedIndex == 1) /* Items Tab */
+            switch(tabWindow.SelectedIndex)
             {
-                refreshItemList();
+                case 0:
+                    //refreshBlockList();
+                    //verifyWindowVisibility(selectedBlockIndex);
+                    break;
+                case 1:
+                    refreshItemList();
+                    verifyWindowVisibility(selectedItemIndex);
+                    break;
+                case 2:
+                    refreshFileList();
+                    verifyWindowVisibility(selectedFileIndex);
+                    break;
             }
         }
 
@@ -57,15 +75,23 @@ namespace Datapackager.forms
         private void addItemButton_Click(object sender, EventArgs e)
         {
             pack.addNewItem();
+
             refreshItemList();
+
+            itemList.SelectedIndex = itemList.Items.Count - 1;
         }
 
         private void removeItemButton_Click(object sender, EventArgs e)
         {
             pack.removeItem(itemList.SelectedIndex);
-            selectedItemIndex = -1;
+
             refreshItemList();
-            clearItemEditor();
+
+            int newIndex = Math.Min(selectedItemIndex, itemList.Items.Count - 1);
+            selectedItemIndex = -1;
+            itemList.SelectedIndex = newIndex;
+
+            verifyWindowVisibility(selectedItemIndex);
         }
 
         private void itemList_SelectedIndexChange(object sender, EventArgs e)
@@ -99,6 +125,8 @@ namespace Datapackager.forms
                         break;
                 }
             }
+            
+            verifyWindowVisibility(selectedItemIndex);
         }
 
         private void itemTexture_Click(object senter, EventArgs e)
@@ -113,6 +141,7 @@ namespace Datapackager.forms
             {
                 itemList.Items.Add(item["name"]);
             }
+            verifyWindowVisibility(selectedItemIndex);
         }
 
         private void clearItemEditor()
@@ -173,9 +202,9 @@ namespace Datapackager.forms
         {
             saveProjectDialog.ShowDialog();
             //TODO: handle cancel
-            // TODO: save block
-            // TODO: save files
+            // TODO: save blocks
             saveItem();
+            saveFile();
             pack.saveProject(saveProjectDialog.OpenFile());
         }
 
@@ -184,11 +213,13 @@ namespace Datapackager.forms
             loadProjectDialog.ShowDialog();
             pack.loadProject(loadProjectDialog.OpenFile());
             refreshItemList();
+            refreshFileList();
         }
 
         private void exportButton_Click(object sender, EventArgs e)
         {
             saveItem();
+            saveFile();
             exportProjectDialog.ShowDialog();
             pack.exportProject(exportProjectDialog.SelectedPath);
         }
@@ -196,6 +227,81 @@ namespace Datapackager.forms
         private void exportProjectDialog_HelpRequest(object sender, EventArgs e)
         {
 
+        }
+
+        private void fileList_SelectedItemChange(object sender, EventArgs e)
+        {
+            saveFile();
+
+            selectedFileIndex = fileList.SelectedIndex;
+            if(selectedFileIndex >= 0)
+            {
+                Dictionary<string, dynamic> selectedFile = pack.getFileRegistry()[selectedFileIndex];
+                fileNamespace.Text = selectedFile["namespace"];
+                filePath.Text = selectedFile["path"];
+                if (selectedFile["datapack"]) { filePackDatapack.Checked = true; }
+                else { filePackResource.Checked = true; }
+                fileContents.Text = selectedFile["contents"];
+            }
+
+            verifyWindowVisibility(selectedFileIndex);
+        }
+
+        private void addFileButton_Click(object sender, EventArgs e)
+        {
+            pack.addNewFile();
+            selectedFileIndex = -1;
+
+            refreshFileList();
+
+            fileList.SelectedIndex = fileList.Items.Count - 1;
+        }
+
+        private void removeFileButton_Click(object sender, EventArgs e)
+        {
+            pack.removeFile(fileList.SelectedIndex);
+
+            refreshFileList();
+
+            int newIndex = Math.Min(selectedFileIndex, fileList.Items.Count - 1);
+            selectedFileIndex = -1;
+            fileList.SelectedIndex = newIndex;
+            selectedFileIndex = fileList.SelectedIndex;
+
+            verifyWindowVisibility(selectedFileIndex);
+        }
+
+        private void updateFileName_LeaveControlFocus(object sender, EventArgs e)
+        {
+            saveFile();
+            refreshFileList();
+        }
+
+        private void saveFile()
+        {
+            if (selectedFileIndex >= 0)
+            {
+                Dictionary<string, dynamic> selectedFile = pack.getFileRegistry()[selectedFileIndex];
+                selectedFile["namespace"] = fileNamespace.Text;
+                selectedFile["path"] = filePath.Text;
+                selectedFile["contents"] = fileContents.Text;
+                selectedFile["datapack"] = filePackDatapack.Checked;
+            }
+        }
+
+        private void refreshFileList()
+        {
+            fileList.Items.Clear();
+            foreach(Dictionary<string, dynamic> file in pack.getFileRegistry())
+            {
+                fileList.Items.Add("(" + file["namespace"] + ") " + Path.GetFileName(file["path"]));
+            }
+            verifyWindowVisibility(selectedFileIndex);
+        }
+
+        private void verifyWindowVisibility(int selectedIndex)
+        {
+            windowControl.Visible = selectedIndex >= 0;
         }
     }
 }
