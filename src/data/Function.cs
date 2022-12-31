@@ -8,18 +8,25 @@ namespace Datapackager.src.data
 {
     internal class Function
     {
-        private string name;
+        private string path;
+        private string packNamespace;
         private List<string> commands;
 
-        public Function(string name)
+        public Function(string path, string packNamespace)
         {
-            this.name = name;
+            this.path = path;
+            this.packNamespace = packNamespace;
             this.commands = new List<string>();
         }
 
-        public Function(string name, string command) : this(name)
+        public Function(string name, string packNamespace, string command) : this(name, packNamespace)
         {
             addCommand(command);
+        }
+
+        public string getFilePath()
+        {
+            return packNamespace + "\\functions\\" + path + ".mcfunction";
         }
 
         public void addCommand(string command)
@@ -40,6 +47,11 @@ namespace Datapackager.src.data
                 functionString += command + "\n";
             }
             return functionString;
+        }
+
+        public string getFunctionPath()
+        {
+            return packNamespace + ":" + path.Replace("\\", "/");
         }
     }
 }

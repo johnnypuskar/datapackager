@@ -562,7 +562,6 @@
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.windowControl);
             this.Controls.Add(this.tabWindow);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "EditorView";
             this.Text = "Datapackager";

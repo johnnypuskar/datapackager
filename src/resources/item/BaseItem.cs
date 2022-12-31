@@ -39,10 +39,10 @@ namespace Datapackager.src.resources.item
 
         public BaseItem(string name, string texturePath, string baseItem, int modelID) : this(name, texturePath, baseItem, modelID, new Dictionary<string, dynamic>(), baseItem + ".json") { }
 
-        public Function giveFunction()
+        public string giveCommand()
         {
             
-            return new Function(getName(), "give @s " + baseItem + getNbtString());
+            return "give @s " + baseItem + getNbtString();
         }
 
         public void mergeNewNbt(Dictionary<string, dynamic> newNbt)

@@ -21,6 +21,8 @@ namespace Datapackager.src.data
         private List<BaseItem> items;
         private List<PackFile> packFiles;
 
+        private List<Function> functions;
+
         public Datapack(string exportPath, string name, string desc) : this(exportPath, name, desc, CURRENT_DATAPACK_VERSION) { }
 
         public Datapack(string exportPath, string name, string desc, int version)
@@ -29,6 +31,7 @@ namespace Datapackager.src.data
             this.name = name;
             this.items = new List<BaseItem>();
             this.packFiles = new List<PackFile>();
+            this.functions = new List<Function>();
             this.packMCMETA = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(DEFAULT_MCMETA.Replace("%PACK_FORMAT%", version.ToString()).Replace("%PACK_DESCRIPTION%", desc));
         }
 
@@ -37,27 +40,68 @@ namespace Datapackager.src.data
             if (Directory.Exists(directory)) { Directory.Delete(directory, true); }
             Directory.CreateDirectory(directory);
 
-            createFile(directory, "pack.mcmeta", JsonConvert.SerializeObject(packMCMETA));
+            createFile(directory + "\\pack.mcmeta", JsonConvert.SerializeObject(packMCMETA));
             Directory.CreateDirectory(directory + "\\data");
+
+            // Create load and tick function, as well as the functon tags to set them up to work properly
+            Function load = new Function("z\\load", name);
+            Function tick = new Function("z\\tick", name);
+
+            Dictionary<string, dynamic> loadTag = new Dictionary<string, dynamic>() { { "values", new List<string>() { load.getFunctionPath() } } };
+            Dictionary<string, dynamic> tickTag = new Dictionary<string, dynamic>() { { "values", new List<string>() { tick.getFunctionPath() } } };
+
+            functions.Add(load);
+            functions.Add(tick);
+
+            Function convertTo = new Function("z\\process_convert_to", name);
+            functions.Add(convertTo);
 
             foreach(BaseItem item in items)
             {
-                createFile(directory + "\\data\\" + name + "\\functions\\give", item.getInternalName() + ".mcfunction", item.giveFunction().getCommandsString());
+                Function giveFunction = new Function("give\\" + item.getName(), name, item.giveCommand());
+                createFile(directory + "\\data\\" + giveFunction.getFilePath(), giveFunction.getCommandsString());
+
+                // Handle ConvertTo convenience NBT tag
+                convertTo.addCommand("execute if entity @s[nbt={Item:{tag:{ConvertTo:\"" + item.getInternalName() + "\"}}}] run data merge entity @s {Item:{id:\"minecraft:" + item.getBaseItem() + "\",tag:" + item.getNbtString() +"}}");
             }
+            tick.addCommand("execute as @e[type=item] if data entity @s Item.tag.ConvertTo run function " + convertTo.getFunctionPath());
 
             foreach(PackFile packFile in packFiles)
             {
-                createFile(directory + "\\data\\" + Path.GetDirectoryName(packFile.getPath()), Path.GetFileName(packFile.getPath()), packFile.getContents());
+                createFile(directory + "\\data\\" + packFile.getPath(), packFile.getContents());
             }
+
+            // Process adding functions into datapack
+            foreach(Function function in functions)
+            {
+                if (function.getCommands().Any())
+                {
+                    createFile(directory + "\\data\\" + function.getFilePath(), function.getCommandsString());
+                }
+            }
+
+            // Create load.mcfunction file if any commands are in the function, as well as assigning it the proper tag.
+            if (load.getCommands().Any())
+            {
+                createFile(directory + "\\data\\minecraft\\tags\\functions\\load.json", JsonConvert.SerializeObject(loadTag));
+            }
+
+            // Create tick.mcfunction file if any commands are in the function, as well as assigning it the proper tag.
+            if (tick.getCommands().Any())
+            {
+                createFile(directory + "\\data\\minecraft\\tags\\functions\\tick.json", JsonConvert.SerializeObject(tickTag));
+            }
+
         }
 
-        public bool createFile(string location, string name, string contents)
+        public bool createFile(string path, string contents)
         {
             try
             {
+                string location = Path.GetDirectoryName(path);
                 if (!Directory.Exists(location)) { Directory.CreateDirectory(location); }
 
-                using (FileStream fs = File.Create(location + "\\" + name))
+                using (FileStream fs = File.Create(path))
                 {
                     StreamWriter writer = new StreamWriter(fs);
                     writer.Write(contents);
