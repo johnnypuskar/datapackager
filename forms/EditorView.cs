@@ -183,12 +183,29 @@ namespace Datapackager.forms
             try
             {
                 if(filePath is null) { throw new Exception(); }
-                itemTextureDisplay.Image = Image.FromFile(filePath);
+
+                Bitmap itemImage = new Bitmap(Image.FromFile(filePath));
+                Bitmap result = new Bitmap(itemTextureDisplay.Size.Width, itemTextureDisplay.Size.Height);
+                using (Graphics g = Graphics.FromImage(result))
+                {
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    g.DrawImage(itemImage, 0, 0, itemTextureDisplay.Size.Width, itemTextureDisplay.Size.Height);
+                }
+                itemTextureDisplay.Image = result;
+
                 itemTextureDisplay.Tag = filePath;
             }
             catch(Exception e)
             {
-                itemTextureDisplay.Image = Resources.default_item;
+                Bitmap itemImage = new Bitmap(Resources.default_item);
+                Bitmap result = new Bitmap(itemTextureDisplay.Size.Width, itemTextureDisplay.Size.Height);
+                using (Graphics g = Graphics.FromImage(result))
+                {
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                    g.DrawImage(itemImage, 0, 0, itemTextureDisplay.Size.Width, itemTextureDisplay.Size.Height);
+                }
+                itemTextureDisplay.Image = result;
+
                 itemTextureDisplay.Tag = null;
             }
         }
