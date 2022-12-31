@@ -13,6 +13,8 @@ namespace Datapackager.src.data
 {
     internal class ProjectPack
     {
+        private string projectName;
+
         private List<Dictionary<string, dynamic>> itemRegistry;
         private List<Dictionary<string, dynamic>> fileRegistry;
         
@@ -24,10 +26,9 @@ namespace Datapackager.src.data
 
         public bool exportProject(string exportPath)
         {
-            string projectName = "export";
 
-            ResourcePack rp = new ResourcePack(exportPath + "\\" + projectName + "_RP");
-            Datapack dp = new Datapack(exportPath + "\\" + projectName + "_DP", projectName, "");
+            ResourcePack rp = new ResourcePack(exportPath + "\\" + projectName + "[RP]");
+            Datapack dp = new Datapack(exportPath + "\\" + projectName + "[DP]", projectName, "");
 
             foreach (Dictionary<string, dynamic> itemRegister in itemRegistry)
             {
@@ -114,6 +115,11 @@ namespace Datapackager.src.data
         public void removeFile(int index)
         {
             fileRegistry.RemoveAt(index);
+        }
+
+        public void setName(string name)
+        {
+            projectName = name;
         }
 
         public bool saveProject(Stream file)

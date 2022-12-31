@@ -73,6 +73,7 @@
             this.loadProjectDialog = new System.Windows.Forms.OpenFileDialog();
             this.exportButton = new System.Windows.Forms.Button();
             this.exportProjectDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.packName = new System.Windows.Forms.TextBox();
             this.tabWindow.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
@@ -552,11 +553,20 @@
             // 
             this.exportProjectDialog.HelpRequest += new System.EventHandler(this.exportProjectDialog_HelpRequest);
             // 
+            // packName
+            // 
+            this.packName.Location = new System.Drawing.Point(178, 1202);
+            this.packName.Name = "packName";
+            this.packName.PlaceholderText = "pack";
+            this.packName.Size = new System.Drawing.Size(228, 39);
+            this.packName.TabIndex = 6;
+            // 
             // EditorView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1628, 1258);
+            this.Controls.Add(this.packName);
             this.Controls.Add(this.exportButton);
             this.Controls.Add(this.loadButton);
             this.Controls.Add(this.saveButton);
@@ -588,6 +598,7 @@
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -638,5 +649,6 @@
         private RadioButton filePackResource;
         private TextBox fileNamespace;
         private RichTextBox fileContents;
+        private TextBox packName;
     }
 }

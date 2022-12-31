@@ -83,7 +83,7 @@ namespace Datapackager.forms
 
         private void removeItemButton_Click(object sender, EventArgs e)
         {
-            pack.removeItem(itemList.SelectedIndex);
+            pack.removeItem(selectedItemIndex);
 
             refreshItemList();
 
@@ -238,6 +238,8 @@ namespace Datapackager.forms
             saveItem();
             saveFile();
             exportProjectDialog.ShowDialog();
+            if(string.IsNullOrEmpty(packName.Text)) { pack.setName("pack"); }
+            else { pack.setName(packName.Text); }
             pack.exportProject(exportProjectDialog.SelectedPath);
         }
 
@@ -276,7 +278,7 @@ namespace Datapackager.forms
 
         private void removeFileButton_Click(object sender, EventArgs e)
         {
-            pack.removeFile(fileList.SelectedIndex);
+            pack.removeFile(selectedFileIndex);
 
             refreshFileList();
 
